@@ -39,15 +39,6 @@ class EmpresarioController extends Controller
      */
     public function store(Request $request)
     {
-        $ch = curl_init("http://fx.currencysystem.com/webservices/CurrencyServer4.asmx?WSDL");
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-
-        $response=curl_exec($ch);
-        dd(1,$ch);
-        curl_close($ch);
-        fclose($fp);
-        
-
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|max:255',
@@ -147,5 +138,31 @@ class EmpresarioController extends Controller
         $empresario= Empresario::find($id);
         $empresario->activo=0;
         $empresario->save();
+    }
+
+    public function validarCodigo($codigo)
+    {
+        $empresarios = Empresario::where("codigo",$codigo)->get();
+        $empresariosCuenta = $empresarios->count();
+        
+        if($empresariosCuenta == 0){ $empresarioReturn = true; }
+        if($empresariosCuenta >= 1){ $empresarioReturn = false; }
+        return $empresarioReturn;
+    }
+
+    public function validarMoneda($moneda)
+    {
+        $Currency = [
+            'licenseKey' => '',
+            'currency' => $moneda
+        ];
+        $wsdl = 'http://fx.currencysystem.com/webservices/CurrencyServer4.asmx?WSDL';
+        $wsdlCurrency = new \SoapClient($wsdl, [
+                    'encoding' => 'UTF-8',
+                    'trace' => true
+                ]);
+        $resultado = $wsdlCurrency->CurrencyExists($Currency);
+                return $resultado->CurrencyExistsResult;
+        // dd($resultado->CurrencyExistsResult);
     }
 }

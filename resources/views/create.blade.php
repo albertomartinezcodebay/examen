@@ -30,8 +30,9 @@
         {{ method_field('PATCH') }}
         @endif
         <div class="form-group">
-          <label for="formGroupExampleInput">Codigo de Empresario</label>
-          <input type="text" class="form-control" name="codigo" value="{{isset($empresario)?($empresario->codigo):('')}}" placeholder="Codigo">
+          <label for="codigo">Codigo de Empresario</label>
+          <input type="text" class="form-control" id="codigo" name="codigo" value="{{isset($empresario)?($empresario->codigo):('')}}" placeholder="Codigo">
+          <button class="btn btn-danger validarCodigo" type="button">Validar Codigo</button>
         </div>
         <div class="form-group">
           <label for="formGroupExampleInput">Razón Social</label>
@@ -46,8 +47,9 @@
           <input type="text" class="form-control" name="pais" value="{{isset($empresario)?($empresario->pais):('')}}" placeholder="pais">
         </div>
         <div class="form-group">
-          <label for="formGroupExampleInput">Tipo de Moneda</label>
-          <input type="text" class="form-control" name="tipo_moneda" value="{{isset($empresario)?($empresario->tipo_moneda):('')}}" placeholder="Tipo de Moneda">
+          <label for="tipo_moneda">Tipo de Moneda</label>
+          <input type="text" class="form-control" id="tipo_moneda" name="tipo_moneda" value="{{isset($empresario)?($empresario->tipo_moneda):('')}}" placeholder="Tipo de Moneda">
+          <button class="btn btn-danger validarMoneda" type="button">Validar Moneda</button>
         </div>
         <div class="form-group">
           <label for="formGroupExampleInput">Estado</label>
@@ -66,7 +68,48 @@
           <input type="email" class="form-control" name="correo" value="{{isset($empresario)?($empresario->correo):('')}}" aria-describedby="emailHelp" placeholder="correo">
         </div>
         @csrf
-        <button class="btn btn-primary">Enviar</button>
+        <p><button class="btn btn-primary">Enviar</button></p>
       </form>
+      <script>
+        var token='{{ csrf_token() }}'
+        $(document).ready(()=>{
+          $("p").hide();
+          $('.validarMoneda').click((e)=>{
+            var currency = $('#tipo_moneda').val();
+            $.ajax({
+              method:'POST',
+              url:'/empresario/validarMoneda/'+currency,
+              dataType:'JSON',
+              data:{
+                _token:token
+              }
+            }).done((response)=>{
+              alert('Tipo de moneda Valido');
+              $("p").show();
+            }).fail((response)=>{
+              alert('Tipo de moneda Invalido');
+              $("p").hide();
+            })
+          });
+
+          $('.validarCodigo').click((e)=>{
+            var codigo = $('#codigo').val();
+            $.ajax({
+              method:'POST',
+              url:'/empresario/validarCodigo/'+codigo,
+              dataType:'JSON',
+              data:{
+                _token:token
+              }
+            }).done((response)=>{
+              alert('Codigo de Empresario Admitido');
+              $("p").show();
+            }).fail((response)=>{
+              alert('Codigo de Empresario Repetido');
+              $("p").hide();
+            })
+          });
+        })
+      </script>
     </body>
 </html>

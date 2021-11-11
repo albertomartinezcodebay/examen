@@ -1,3 +1,10 @@
+@php
+    namespace App\Http\Controllers;
+    use App\Models\Empresario;
+
+    $empresarios = Empresario::where("activo",1)->get();
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
